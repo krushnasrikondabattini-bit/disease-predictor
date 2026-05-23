@@ -1,0 +1,102 @@
+DISEASE PREDICTION - MODEL COMPARISON REPORT
+=======================================================
+
+Random Forest ← BEST
+  CV Accuracy : 99.86% ± 0.09%
+  Test Accuracy: 99.82%
+
+Gradient Boosting
+  CV Accuracy : 99.73% ± 0.07%
+  Test Accuracy: 99.54%
+
+SVM (RBF)
+  CV Accuracy : 99.79% ± 0.15%
+  Test Accuracy: 99.73%
+
+Naive Bayes
+  CV Accuracy : 99.76% ± 0.09%
+  Test Accuracy: 99.59%
+
+Decision Tree
+  CV Accuracy : 99.27% ± 0.20%
+  Test Accuracy: 99.36%
+
+Ensemble (RF+GB+SVM)
+  CV Accuracy : 99.84% ± 0.10%
+  Test Accuracy: 99.82%
+
+
+DETAILED CLASSIFICATION REPORT (Best Model)
+=======================================================
+                                         precision    recall  f1-score   support
+
+(vertigo) Paroymsal  Positional Vertigo       1.00      1.00      1.00        24
+                                   AIDS       1.00      1.00      1.00        24
+                                   Acne       1.00      1.00      1.00        24
+                    Alcoholic hepatitis       1.00      1.00      1.00        24
+                                Allergy       1.00      1.00      1.00        24
+                       Anxiety Disorder       1.00      1.00      1.00        48
+                           Appendicitis       0.96      1.00      0.98        48
+                              Arthritis       1.00      1.00      1.00        24
+                       Bronchial Asthma       1.00      1.00      1.00        24
+                               COVID-19       1.00      1.00      1.00        48
+                         Celiac Disease       1.00      1.00      1.00        48
+                   Cervical spondylosis       1.00      1.00      1.00        24
+                            Chicken pox       1.00      1.00      1.00        24
+                 Chronic Kidney Disease       1.00      1.00      1.00        48
+                      Chronic Sinusitis       1.00      1.00      1.00        48
+                    Chronic cholestasis       1.00      1.00      1.00        24
+                    Clinical Depression       1.00      1.00      1.00        48
+                            Common Cold       1.00      1.00      1.00        24
+                         Conjunctivitis       1.00      1.00      1.00        48
+                                 Dengue       1.00      1.00      1.00        24
+                              Diabetes        1.00      1.00      1.00        24
+           Dimorphic hemmorhoids(piles)       1.00      1.00      1.00        24
+                          Drug Reaction       1.00      1.00      1.00        24
+                          Ear Infection       1.00      1.00      1.00        48
+                               Epilepsy       1.00      1.00      1.00        48
+                           Fibromyalgia       1.00      1.00      1.00        48
+                       Fungal infection       1.00      1.00      1.00        24
+                                   GERD       1.00      1.00      1.00        24
+                             Gallstones       1.00      0.96      0.98        48
+                        Gastroenteritis       1.00      1.00      1.00        24
+                                   Gout       1.00      1.00      1.00        48
+                           Heart attack       1.00      1.00      1.00        24
+                            Hepatitis B       1.00      1.00      1.00        24
+                            Hepatitis C       1.00      1.00      1.00        24
+                            Hepatitis D       1.00      1.00      1.00        24
+                            Hepatitis E       1.00      1.00      1.00        24
+                          Hypertension        1.00      1.00      1.00        24
+                        Hyperthyroidism       1.00      1.00      1.00        24
+                           Hypoglycemia       1.00      1.00      1.00        24
+                         Hypothyroidism       1.00      1.00      1.00        24
+                               Impetigo       1.00      1.00      1.00        24
+                 Iron Deficiency Anemia       1.00      1.00      1.00        48
+               Irritable Bowel Syndrome       1.00      1.00      1.00        48
+                               Jaundice       1.00      1.00      1.00        24
+                          Kidney Stones       1.00      1.00      1.00        48
+                                  Lupus       1.00      1.00      1.00        48
+                                Malaria       1.00      1.00      1.00        24
+                                Measles       1.00      1.00      1.00        48
+                             Meningitis       1.00      1.00      1.00        48
+                               Migraine       1.00      1.00      1.00        24
+                     Multiple Sclerosis       1.00      1.00      1.00        48
+                        Osteoarthristis       1.00      1.00      1.00        24
+                                   PCOS       1.00      1.00      1.00        48
+                           Pancreatitis       0.96      0.96      0.96        48
+           Paralysis (brain hemorrhage)       1.00      1.00      1.00        24
+                    Parkinson's Disease       1.00      1.00      1.00        48
+                    Peptic ulcer diseae       1.00      1.00      1.00        24
+                              Pneumonia       1.00      1.00      1.00        24
+                              Psoriasis       1.00      1.00      1.00        24
+                               Shingles       1.00      1.00      1.00        48
+                            Tonsillitis       1.00      1.00      1.00        48
+                           Tuberculosis       1.00      1.00      1.00        24
+                                Typhoid       1.00      1.00      1.00        24
+                Urinary tract infection       1.00      1.00      1.00        24
+                         Varicose veins       1.00      1.00      1.00        24
+                            hepatitis A       1.00      1.00      1.00        24
+
+                               accuracy                           1.00      2184
+                              macro avg       1.00      1.00      1.00      2184
+                           weighted avg       1.00      1.00      1.00      2184

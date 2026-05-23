@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DRUG PREDICTION SYSTEM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #efae79;
+    --surface:    #524b48;
+    --surface2:   #faf9f7;
+    --border:     #ddd8d0;
+    --text:       #f6f4f1;
+    --muted:      #c4b7a7;
+    --accent:     #8381d8;       /* sage green */
+    --accent-bg:  #eef4f1;
+    --tag-bg:     #e8f0ed;
+    --pill-sel:   #c8ddd6;
+    --rose:       #ed2f3f;
+    --rose-bg:    #f3a5ab;
+    --amber:      #3bca06;
+    --amber-bg:   #adefbd;
+    --sky:        #4d07f0;
+    --sky-bg:     #9dcfec;
+    --lavender:   #8202d1;
+    --lavender-bg:#c39ce8;
+    --radius:     3px;
+    --font:       'DM Sans', sans-serif;
+    --mono:       'DM Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    font-weight: 400;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center; 
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-dot {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  header h1 {
+    font-size: 25px;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+  header span {
+    font-size: 20px;
+    color: var(--muted);
+    margin-left: auto;
+    font-family: var(--mono);
+  }
+
+  /* ── Layout ─────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    min-height: calc(100vh - 57px);
+  }
+
+  /* ── Left Panel ─────────────────────────── */
+  .left-panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 57px);
+    position: sticky;
+    top: 57px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .panel-header h2 {
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* Search box */
+  .search-wrap {
+    position: relative;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+  #symptom-search {
+    width: 100%;
+    padding: 8px 10px 8px 32px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    font-family: var(--font);
+    font-size: 16px;
+    color: rgb(26, 15, 36);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #symptom-search:focus { border-color: var(--accent); }
+  #symptom-search::placeholder { color: var(--muted); }
+
+  /* Selected tags */
+  .selected-wrap {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    min-height: 52px;
+  }
+  .selected-label {
+    font-size: 16px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 22px;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--tag-bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 3px 8px;
+    font-size: 16px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .tag:hover { background: var(--pill-sel); }
+  .tag-x { font-size: 16px; line-height: 1; opacity: 0.7; }
+  .no-selected { font-size: 15px; color: var(--muted); font-style: italic; }
+
+  /* Symptom list */
+  .symptom-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0;
+  }
+  .symptom-list::-webkit-scrollbar { width: 4px; }
+  .symptom-list::-webkit-scrollbar-track { background: transparent; }
+  .symptom-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sym-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+    font-size: 17px;
+  }
+  .sym-item:hover { background: var(--surface2); }
+  .sym-item.selected { background: var(--accent-bg); color: rgb(5, 49, 66) }
+
+  .sym-check {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.1s;
+  }
+  .sym-item.selected .sym-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .sym-check svg { display: none; }
+  .sym-item.selected .sym-check svg { display: block; }
+
+  .sym-name {
+    text-transform: capitalize;
+  }
+
+  /* Panel footer / Predict button */
+  .panel-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .count-line {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-family: var(--mono);
+  }
+  .count-line b { color: var(--accent); }
+
+  #predict-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 20px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: opacity 0.15s;
+  }
+  #predict-btn:hover { opacity: 0.88; }
+  #predict-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  #clear-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 7px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  #clear-btn:hover { color: var(--text); border-color: var(--text); }
+
+  /* ── Right Panel ────────────────────────── */
+  .right-panel {
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 400px;
+  }
+  .empty-icon {
+    width: 56px; height: 56px;
+    border: 1px solid rgb(53, 11, 11);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: rgb(57, 15, 15);
+    margin-bottom: 4px;
+  }
+  .empty-state p { font-size: 18px; color: rgb(61, 30, 30)}
+  .empty-hint { font-size: 16px; color: #241f1a; }
+
+  /* Loading */
+  .loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 14px;
+    min-height: 400px;
+  }
+  .loader {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-state p { font-size: 18px; color: var(--muted); }
+
+  /* Result card */
+  .result-card {
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Disease hero */
+  .disease-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .disease-icon {
+    width: 44px; height: 44px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent);
+    font-size: 25px;
+  }
+  .disease-info h2 {
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .confidence-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .confidence-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    width: 140px;
+    overflow: hidden;
+  }
+  .confidence-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+  .confidence-pct {
+    font-size: 16px;
+    font-family: var(--mono);
+    color: var(--accent);
+  }
+
+  /* Info grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .info-grid.single { grid-template-columns: 1fr; }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .info-card.rose   { background: var(--rose-bg);     border-color: var(--rose); }
+  .info-card.amber  { background: var(--amber-bg);    border-color: var(--amber); }
+  .info-card.sky    { background: var(--sky-bg);      border-color: var(--sky); }
+  .info-card.lavend { background: var(--lavender-bg); border-color: var(--lavender); }
+  .info-card.sage   { background: var(--accent-bg);   border-color: var(--accent); }
+
+  .card-label {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .info-card.rose   .card-label { color: #a9010f; }
+  .info-card.amber  .card-label { color: #d77701; }
+  .info-card.sky    .card-label { color: #0372b6; }
+  .info-card.lavend .card-label { color: #2901a1; }
+  .info-card.sage   .card-label { color: var(--accent); }
+  .info-card:not(.rose):not(.amber):not(.sky):not(.lavend):not(.sage) .card-label { color: var(--muted); }
+
+  .card-body {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .bullet-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .bullet-list li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .info-card.rose   .bullet-list li::before { color: var(--rose); }
+  .info-card.amber  .bullet-list li::before { color: var(--amber); }
+  .info-card.sky    .bullet-list li::before { color: var(--sky); }
+  .info-card.lavend .bullet-list li::before { color: var(--lavender); }
+  .info-card.sage   .bullet-list li::before { color: var(--accent); }
+
+  .pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pill {
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    border: 1px solid;
+  }
+  .info-card.rose   .pill { background: #f9e2e4; border-color: var(--rose);     color: #a80714; }
+  .info-card.amber  .pill { background: #faecd6; border-color: var(--amber);    color: #8a5e20; }
+  .info-card.sky    .pill { background: #ddedf5; border-color: var(--sky);      color: #2a6080; }
+  .info-card.lavend .pill { background: #e8e3f4; border-color: var(--lavender); color: #5040a0; }
+  .info-card.sage   .pill { background: #dceee8; border-color: var(--accent);   color: #4a7868; }
+
+  /* Disclaimer */
+  .disclaimer {
+    margin-top: 20px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .disclaimer svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Responsive ─────────────────────────── */
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    .left-panel { height: auto; position: static; }
+    .right-panel { padding: 20px; }
+    .info-grid { grid-template-columns: 1fr; }
+    header { padding: 14px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"></div>
+  <h1>DRUG PREDICTION SYSTEM</h1>
+  <span>132 symptoms · 41 diseases</span>
+</header>
+
+<div class="layout">
+
+  <!-- ── Left: Symptom Selector ─────────────── -->
+  <aside class="left-panel">
+
+    <div class="panel-header">
+      <h2>Select Symptoms</h2>
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="symptom-search" type="text" placeholder="Search symptoms…" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="selected-wrap">
+      <div class="selected-label">Selected</div>
+      <div class="tags-row" id="tags-row">
+        <span class="no-selected">None selected</span>
+      </div>
+    </div>
+
+    <div class="symptom-list" id="symptom-list"></div>
+
+    <div class="panel-footer">
+      <div class="count-line">
+        <b id="sel-count">0</b> symptoms selected
+      </div>
+      <button id="predict-btn" disabled>Predict Disease</button>
+      <button id="clear-btn">Clear all</button>
+    </div>
+
+  </aside>
+
+  <!-- ── Right: Results ─────────────────────── -->
+  <main class="right-panel">
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M9 12h6m-3-3v6M5 8a7 7 0 1 1 14 0c0 3.5-2 6-4 8H9c-2-2-4-4.5-4-8Z"/>
+        </svg>
+      </div>
+      <p>Select symptoms to get started</p>
+      <span class="empty-hint">Choose one or more symptoms from the left panel, then click Predict Disease.</span>
+    </div>
+
+    <div class="loading-state" id="loading-state">
+      <div class="loader"></div>
+      <p>Analysing symptoms…</p>
+    </div>
+
+    <div class="result-card" id="result-card">
+
+      <div class="disease-hero">
+        <div class="disease-icon">🔬</div>
+        <div class="disease-info">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Predicted Condition</div>
+          <h2 id="r-disease">—</h2>
+          <div class="confidence-bar-wrap">
+            <div class="confidence-bar">
+              <div class="confidence-fill" id="r-conf-bar" style="width:0%"></div>
+            </div>
+            <span class="confidence-pct" id="r-conf-pct">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-grid single">
+        <div class="info-card">
+          <div class="card-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
+            Description
+          </div>
+          <div class="card-body" id="r-desc">—</div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card rose">
+          <div class="card-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Precautions
+          </div>
+          <ul class="bullet-list" id="r-prec"></ul>
+        </div>
+
+        <div class="info-card amber">
+          <div class="card-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+            Medications
+          </div>
+          <div class="pill-list" id="r-meds"></div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card sky">
+          <div class="card-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+            Recommended Diet
+          </div>
+          <div class="pill-list" id="r-diet"></div>
+        </div>
+
+        <div class="info-card lavend">
+          <div class="card-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Workout & Lifestyle
+          </div>
+          <ul class="bullet-list" id="r-workout"></ul>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
+        This tool is for educational purposes only. Predictions are based on a machine learning model trained on a structured dataset and should not be used as a substitute for professional medical advice. Always consult a qualified healthcare provider.
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ── All 132 symptoms ──────────────────────────────────────────
+const ALL_SYMPTOMS = ["itching","skin_rash","nodal_skin_eruptions","continuous_sneezing","shivering","chills","joint_pain","stomach_pain","acidity","ulcers_on_tongue","muscle_wasting","vomiting","burning_micturition","spotting_ urination","fatigue","weight_gain","anxiety","cold_hands_and_feets","mood_swings","weight_loss","restlessness","lethargy","patches_in_throat","irregular_sugar_level","cough","high_fever","sunken_eyes","breathlessness","sweating","dehydration","indigestion","headache","yellowish_skin","dark_urine","nausea","loss_of_appetite","pain_behind_the_eyes","back_pain","constipation","abdominal_pain","diarrhoea","mild_fever","yellow_urine","yellowing_of_eyes","acute_liver_failure","fluid_overload","swelling_of_stomach","swelled_lymph_nodes","malaise","blurred_and_distorted_vision","phlegm","throat_irritation","redness_of_eyes","sinus_pressure","runny_nose","congestion","chest_pain","weakness_in_limbs","fast_heart_rate","pain_during_bowel_movements","pain_in_anal_region","bloody_stool","irritation_in_anus","neck_pain","dizziness","cramps","bruising","obesity","swollen_legs","swollen_blood_vessels","puffy_face_and_eyes","enlarged_thyroid","brittle_nails","swollen_extremeties","excessive_hunger","extra_marital_contacts","drying_and_tingling_lips","slurred_speech","knee_pain","hip_joint_pain","muscle_weakness","stiff_neck","swelling_joints","movement_stiffness","spinning_movements","loss_of_balance","unsteadiness","weakness_of_one_body_side","loss_of_smell","bladder_discomfort","foul_smell_of urine","continuous_feel_of_urine","passage_of_gases","internal_itching","toxic_look_(typhos)","depression","irritability","muscle_pain","altered_sensorium","red_spots_over_body","belly_pain","abnormal_menstruation","dischromic _patches","watering_from_eyes","increased_appetite","polyuria","family_history","mucoid_sputum","rusty_sputum","lack_of_concentration","visual_disturbances","receiving_blood_transfusion","receiving_unsterile_injections","coma","stomach_bleeding","distention_of_abdomen","history_of_alcohol_consumption","fluid_overload.1","blood_in_sputum","prominent_veins_on_calf","palpitations","painful_walking","pus_filled_pimples","blackheads","scurring","skin_peeling","silver_like_dusting","small_dents_in_nails","inflammatory_nails","blister","red_sore_around_nose","yellow_crust_ooze"];
+
+const API = 'http://localhost:5000';
+
+let selected = new Set();
+
+// ── Render symptom list ───────────────────────────────────────
+function label(sym) {
+  return sym.replace(/_/g,' ').replace(/\./g,' ').trim()
+            .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function renderList(filter = '') {
+  const list = document.getElementById('symptom-list');
+  list.innerHTML = '';
+  const q = filter.toLowerCase();
+  const filtered = ALL_SYMPTOMS.filter(s => s.replace(/_/g,' ').includes(q));
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:20px;font-size:12px;color:var(--muted);text-align:center">No symptoms found</div>';
+    return;
+  }
+  filtered.forEach(sym => {
+    const div = document.createElement('div');
+    div.className = 'sym-item' + (selected.has(sym) ? ' selected' : '');
+    div.dataset.sym = sym;
+    div.innerHTML = `
+      <div class="sym-check">
+        <svg width="10" height="10" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <span class="sym-name">${label(sym)}</span>`;
+    div.addEventListener('click', () => toggleSymptom(sym));
+    list.appendChild(div);
+  });
+}
+
+function toggleSymptom(sym) {
+  if (selected.has(sym)) {
+    selected.delete(sym);
+  } else {
+    selected.add(sym);
+  }
+  renderList(document.getElementById('symptom-search').value);
+  renderTags();
+  updateCount();
+}
+
+function renderTags() {
+  const row = document.getElementById('tags-row');
+  if (selected.size === 0) {
+    row.innerHTML = '<span class="no-selected">None selected</span>';
+    return;
+  }
+  row.innerHTML = '';
+  selected.forEach(sym => {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = `${label(sym)} <span class="tag-x">×</span>`;
+    tag.addEventListener('click', () => toggleSymptom(sym));
+    row.appendChild(tag);
+  });
+}
+
+function updateCount() {
+  document.getElementById('sel-count').textContent = selected.size;
+  document.getElementById('predict-btn').disabled = selected.size === 0;
+}
+
+// ── Search ────────────────────────────────────────────────────
+document.getElementById('symptom-search').addEventListener('input', e => {
+  renderList(e.target.value);
+});
+
+// ── Clear ─────────────────────────────────────────────────────
+document.getElementById('clear-btn').addEventListener('click', () => {
+  selected.clear();
+  renderList(document.getElementById('symptom-search').value);
+  renderTags();
+  updateCount();
+  showEmpty();
+});
+
+// ── Show states ───────────────────────────────────────────────
+function showEmpty() {
+  document.getElementById('empty-state').style.display  = 'flex';
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('result-card').style.display   = 'none';
+}
+function showLoading() {
+  document.getElementById('empty-state').style.display   = 'none';
+  document.getElementById('loading-state').style.display = 'flex';
+  document.getElementById('result-card').style.display   = 'none';
+}
+function showResult() {
+  document.getElementById('empty-state').style.display   = 'none';
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('result-card').style.display   = 'block';
+}
+
+// ── Parse list string from CSV ────────────────────────────────
+function parseList(str) {
+  if (!str || str === 'Not available.') return [];
+  return str.replace(/[\[\]']/g,'').split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// ── Predict ───────────────────────────────────────────────────
+document.getElementById('predict-btn').addEventListener('click', async () => {
+  if (selected.size === 0) return;
+  showLoading();
+  try {
+    const resp = await fetch(`${API}/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symptoms: Array.from(selected) })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Prediction failed');
+    renderResult(data);
+    showResult();
+  } catch (err) {
+    showError(err.message);
+  }
+});
+
+function renderResult(d) {
+  // Disease & confidence
+  document.getElementById('r-disease').textContent = d.disease || '—';
+  const conf = d.confidence_pct || 0;
+  document.getElementById('r-conf-bar').style.width = conf + '%';
+  document.getElementById('r-conf-pct').textContent = conf ? conf.toFixed(1) + '% confidence' : '';
+
+  // Description
+  document.getElementById('r-desc').textContent = d.description || 'Not available.';
+
+  // Precautions
+  const prec = document.getElementById('r-prec');
+  prec.innerHTML = '';
+  const precList = Array.isArray(d.precautions) ? d.precautions : parseList(d.precautions);
+  if (precList.length) {
+    precList.forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = p.replace(/_/g,' ');
+      prec.appendChild(li);
+    });
+  } else {
+    prec.innerHTML = '<li>Not available</li>';
+  }
+
+  // Medications
+  const meds = document.getElementById('r-meds');
+  meds.innerHTML = '';
+  parseList(d.medications).forEach(m => {
+    const pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.textContent = m;
+    meds.appendChild(pill);
+  });
+  if (!meds.children.length) meds.textContent = 'Not available';
+
+  // Diet
+  const diet = document.getElementById('r-diet');
+  diet.innerHTML = '';
+  parseList(d.diet).forEach(item => {
+    const pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.textContent = item;
+    diet.appendChild(pill);
+  });
+  if (!diet.children.length) diet.textContent = 'Not available';
+
+  // Workout
+  const wo = document.getElementById('r-workout');
+  wo.innerHTML = '';
+  const woList = Array.isArray(d.workout) ? d.workout : parseList(d.workout);
+  if (woList.length) {
+    woList.forEach(w => {
+      const li = document.createElement('li');
+      li.textContent = w;
+      wo.appendChild(li);
+    });
+  } else {
+    wo.innerHTML = '<li>Not available</li>';
+  }
+}
+
+function showError(msg) {
+  document.getElementById('empty-state').style.display  = 'none';
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('result-card').style.display   = 'block';
+  document.getElementById('r-disease').textContent = 'Error';
+  document.getElementById('r-conf-pct').textContent = '';
+  document.getElementById('r-conf-bar').style.width = '0%';
+  document.getElementById('r-desc').textContent = '⚠️ ' + msg + '\n\nMake sure the Flask API is running: python app/api.py';
+  ['r-prec','r-meds','r-diet','r-workout'].forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────
+renderList();
+showEmpty();
+</script>
+</body>
+</html>
