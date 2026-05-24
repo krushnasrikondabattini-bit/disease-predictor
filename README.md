@@ -210,6 +210,9 @@ Arthritis, (vertigo) Paroxysmal Positional Vertigo, Acne, Urinary tract infectio
 Psoriasis, Impetigo
 
 ---
+## Project Output
+
+![Disease Prediction](assets/images/disease-prediction.png)
 
 ## ⚠️ Disclaimer
 
