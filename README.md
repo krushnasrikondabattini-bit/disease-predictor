@@ -212,7 +212,7 @@ Psoriasis, Impetigo
 ---
 ## Project Output
 
-![Disease Prediction](assets/images/disease-prediction.png)
+![Disease Prediction](disease_predictor/assets/images/disease-prediction.png)
 
 ## ⚠️ Disclaimer
 
